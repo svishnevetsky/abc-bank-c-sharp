@@ -28,6 +28,18 @@ namespace AbcBank
             return this;
         }
 
+        public Customer transfer(Account fromAccount, Account toAccount, double transferAmoumt)
+        {
+            //in statement transfer will appear as withdraw for one account and deposit for another
+            //TO DO It should be different
+            fromAccount.withdraw(transferAmoumt, true);
+            toAccount.deposit(transferAmoumt, true);
+
+
+            return this;
+        }
+
+
         public int getNumberOfAccounts()
         {
             return accounts.Count;
@@ -63,7 +75,7 @@ namespace AbcBank
         private String statementForAccount(Account a)
         {
             String s = "";
-
+            string tranType = "";
             //Translate to pretty account type
             switch (a.getAccountType())
             {
@@ -82,7 +94,8 @@ namespace AbcBank
             double total = 0.0;
             foreach (Transaction t in a.transactions)
             {
-                s += "  " + (t.amount < 0 ? "withdrawal" : "deposit") + " " + toDollars(t.amount) + "\n";
+                tranType = (t.tranType == Transaction.operation.Transfer ? "transfer" + (t.amount < 0 ? " from" : " to") : (t.tranType == Transaction.operation.Withdrawal ? "withdrawal" : "deposit"));
+                s += "  " + tranType + " " + toDollars(t.amount) + "\n";
                 total += t.amount;
             }
             s += "Total " + toDollars(total);

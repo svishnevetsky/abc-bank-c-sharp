@@ -22,7 +22,7 @@ namespace AbcBank
             this.transactions = new List<Transaction>();
         }
 
-        public void deposit(double amount)
+        public void deposit(double amount, bool isTransfer)
         {
             if (amount <= 0)
             {
@@ -30,11 +30,12 @@ namespace AbcBank
             }
             else
             {
-                transactions.Add(new Transaction(amount));
+                transactions.Add(new Transaction(amount, isTransfer ? Transaction.operation.Transfer : Transaction.operation.Deposit));
+
             }
         }
 
-        public void withdraw(double amount)
+        public void withdraw(double amount, bool isTransfer)
         {
             if (amount <= 0)
             {
@@ -42,7 +43,7 @@ namespace AbcBank
             }
             else
             {
-                transactions.Add(new Transaction(-amount));
+                transactions.Add(new Transaction(-amount, isTransfer ? Transaction.operation.Transfer : Transaction.operation.Withdrawal));
             }
         }
 
@@ -60,11 +61,20 @@ namespace AbcBank
                 //     if (amount <= 4000)
                 //         return 20;
                 case MAXI_SAVINGS:
-                    if (amount <= 1000)
-                        return amount * 0.02;
-                    if (amount <= 2000)
-                        return 20 + (amount - 1000) * 0.05;
-                    return 70 + (amount - 2000) * 0.1;
+                    //old
+                    //if (amount <= 1000)
+                    //    return amount * 0.02;
+                    //else if (amount <= 2000)
+                    //    return 20 + (amount - 1000) * 0.05;
+                    //else 
+                    //    return 70 + (amount - 2000) * 0.1;
+
+                    //new 
+                    if (this.isWithdrawal(10))
+                        return amount * 0.001;
+                    else
+                        return amount * 0.05;
+
                 default:
                     return amount * 0.001;
             }
@@ -81,6 +91,21 @@ namespace AbcBank
             foreach (Transaction t in transactions)
                 amount += t.amount;
             return amount;
+        }
+
+        public bool isWithdrawal(int numOfDays)
+        {
+            bool ret = false;
+            foreach (Transaction t in transactions)
+            {
+                if (t.amount < 0 && t.transactionDate > DateTime.Now.AddDays(-numOfDays))
+                {
+                    ret = true;
+                    break;
+                }
+            }
+            return ret;
+
         }
 
         public int getAccountType()

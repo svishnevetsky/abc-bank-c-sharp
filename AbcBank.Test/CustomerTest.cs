@@ -20,9 +20,9 @@ namespace AbcBank.Test
 
             Customer henry = new Customer("Henry").openAccount(checkingAccount).openAccount(savingsAccount);
 
-            checkingAccount.deposit(100.0);
-            savingsAccount.deposit(4000.0);
-            savingsAccount.withdraw(200.0);
+            checkingAccount.deposit(100.0, false);
+            savingsAccount.deposit(4000.0, false);
+            savingsAccount.withdraw(200.0, false);
 
             Assert.AreEqual("Statement for Henry\n" +
                     "\n" +
@@ -34,6 +34,36 @@ namespace AbcBank.Test
                     "  deposit $4,000.00\n" +
                     "  withdrawal $200.00\n" +
                     "Total $3,800.00\n" +
+                    "\n" +
+                    "Total In All Accounts $3,900.00", henry.getStatement());
+        }
+
+        [Test] //Test customer statement generation with transfer
+        public void testAppWithTransfer()
+        {
+
+            Account checkingAccount = new Account(Account.CHECKING);
+            Account savingsAccount = new Account(Account.SAVINGS);
+
+            Customer henry = new Customer("Henry").openAccount(checkingAccount).openAccount(savingsAccount);
+
+            checkingAccount.deposit(100.0, false);
+            savingsAccount.deposit(4000.0, false);
+            savingsAccount.withdraw(200.0, false);
+            henry.transfer(savingsAccount, checkingAccount, 400);
+
+            Assert.AreEqual("Statement for Henry\n" +
+                    "\n" +
+                    "Checking Account\n" +
+                    "  deposit $100.00\n" +
+                    "  transfer to $400.00\n" +
+                    "Total $500.00\n" +
+                    "\n" +
+                    "Savings Account\n" +
+                    "  deposit $4,000.00\n" +
+                    "  withdrawal $200.00\n" +
+                    "  transfer from $400.00\n" +
+                    "Total $3,400.00\n" +
                     "\n" +
                     "Total In All Accounts $3,900.00", henry.getStatement());
         }
